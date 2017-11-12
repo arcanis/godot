@@ -618,6 +618,46 @@ bool Control::has_point(const Point2 &p_point) const {
 	return Rect2(Point2(), get_size()).has_point(p_point);
 }
 
+void Control::_drag_enter(const Variant &p_data) {
+
+	if (data.drag_owner) {
+		Object *obj = ObjectDB::get_instance(data.drag_owner);
+		if (obj) {
+			Control *c = obj->cast_to<Control>();
+			c->call("_drag_enter_fw", p_data, this);
+			return;
+		}
+	}
+
+	if (get_script_instance()) {
+		const Variant *p = &p_data;
+		Variant::CallError ce;
+		Variant ret = get_script_instance()->call(SceneStringNames::get_singleton()->_drag_enter, &p, 1, ce);
+		if (ce.error == Variant::CallError::CALL_OK)
+			return;
+	}
+}
+
+void Control::_drag_leave(const Variant &p_data) {
+
+	if (data.drag_owner) {
+		Object *obj = ObjectDB::get_instance(data.drag_owner);
+		if (obj) {
+			Control *c = obj->cast_to<Control>();
+			c->call("drag_leave_fw", p_data, this);
+			return;
+		}
+	}
+
+	if (get_script_instance()) {
+		const Variant *p = &p_data;
+		Variant::CallError ce;
+		Variant ret = get_script_instance()->call(SceneStringNames::get_singleton()->_drag_leave, &p, 1, ce);
+		if (ce.error == Variant::CallError::CALL_OK)
+			return;
+	}
+}
+
 void Control::set_drag_forwarding(Control *p_target) {
 
 	if (p_target)
@@ -2318,7 +2358,11 @@ void Control::_bind_methods() {
 	ObjectTypeDB::bind_method(_MD("_font_changed"), &Control::_font_changed);
 
 	BIND_VMETHOD(MethodInfo("_input_event", PropertyInfo(Variant::INPUT_EVENT, "event")));
-	BIND_VMETHOD(MethodInfo(Variant::VECTOR2, "get_minimum_size"));
+
+        BIND_VMETHOD(MethodInfo("_drag_enter", PropertyInfo(Variant::NIL, "data")));
+        BIND_VMETHOD(MethodInfo("_drag_leave", PropertyInfo(Variant::NIL, "data")));
+
+        BIND_VMETHOD(MethodInfo(Variant::VECTOR2, "get_minimum_size"));
 	BIND_VMETHOD(MethodInfo(Variant::OBJECT, "get_drag_data", PropertyInfo(Variant::VECTOR2, "pos")));
 	BIND_VMETHOD(MethodInfo(Variant::BOOL, "can_drop_data", PropertyInfo(Variant::VECTOR2, "pos"), PropertyInfo(Variant::NIL, "data")));
 	BIND_VMETHOD(MethodInfo("drop_data", PropertyInfo(Variant::VECTOR2, "pos"), PropertyInfo(Variant::NIL, "data")));

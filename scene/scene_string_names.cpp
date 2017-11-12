@@ -151,6 +151,9 @@ SceneStringNames::SceneStringNames() {
 
 	play_play = StaticCString::create("play/play");
 
+        _drag_enter = StaticCString::create("_drag_enter");
+        _drag_leave = StaticCString::create("_drag_leave");
+
 	get_drag_data = StaticCString::create("get_drag_data");
 	drop_data = StaticCString::create("drop_data");
 	can_drop_data = StaticCString::create("can_drop_data");

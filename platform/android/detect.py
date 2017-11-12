@@ -26,7 +26,7 @@ def get_opts():
     return [
         ('ANDROID_NDK_ROOT', 'the path to Android NDK',
          os.environ.get("ANDROID_NDK_ROOT", 0)),
-        ('ndk_platform', 'compile for platform: (android-<api> , example: android-14)', "android-14"),
+        ('ndk_platform', 'compile for platform: (android-<api> , example: android-14)', "android-21"),
         ('android_arch', 'select compiler architecture: (armv7/armv6/x86)', "armv7"),
         ('android_neon', 'enable neon (armv7 only)', "yes"),
         ('android_stl', 'enable STL support in android port (for modules)', "no")
@@ -234,7 +234,7 @@ def configure(env):
         env.Append(CPPFLAGS=['-O0', '-D_DEBUG', '-UNDEBUG', '-DDEBUG_ENABLED',
                              '-DDEBUG_MEMORY_ALLOC', '-g', '-fno-limit-debug-info'])
 
-    env.Append(CPPFLAGS=['-DANDROID_ENABLED',
+    env.Append(CPPFLAGS=['-DANDROID_ENABLED', '-D__ANDROID_API__=21',
                          '-DUNIX_ENABLED', '-DNO_FCNTL', '-DMPC_FIXED_POINT'])
 
     # TODO: Move that to opus module's config
@@ -244,13 +244,25 @@ def configure(env):
         env.opus_fixed_point = "yes"
 
     if (env['android_stl'] == 'yes'):
+        #env.Append(CPPPATH=[env["ANDROID_NDK_ROOT"] +
+        #                    "/sources/cxx-stl/gnu-libstdc++/4.9/include"])
+        #env.Append(CPPPATH=[env["ANDROID_NDK_ROOT"] +
+        #                    "/sources/cxx-stl/gnu-libstdc++/4.9/libs/" + arch_subpath + "/include"])
+        #env.Append(LIBPATH=[env["ANDROID_NDK_ROOT"] +
+        #                    "/sources/cxx-stl/gnu-libstdc++/4.9/libs/" + arch_subpath])
+
+        #env.Append(LIBS=["gnustl_static"])
         env.Append(CPPPATH=[env["ANDROID_NDK_ROOT"] +
-                            "/sources/cxx-stl/gnu-libstdc++/4.9/include"])
+                            "/sources/android/support/include"])
         env.Append(CPPPATH=[env["ANDROID_NDK_ROOT"] +
-                            "/sources/cxx-stl/gnu-libstdc++/4.9/libs/" + arch_subpath + "/include"])
+                            "/sources/cxx-stl/llvm-libc++/include"])
+        env.Append(CPPPATH=[env["ANDROID_NDK_ROOT"] +
+                            "/sysroot/usr/include"])
+        env.Append(CPPPATH=[env["ANDROID_NDK_ROOT"] +
+                            "/sysroot/usr/include/arm-linux-androideabi"])
         env.Append(LIBPATH=[env["ANDROID_NDK_ROOT"] +
-                            "/sources/cxx-stl/gnu-libstdc++/4.9/libs/" + arch_subpath])
-        env.Append(LIBS=["gnustl_static"])
+                            "/sources/cxx-stl/llvm-libc++/libs/" + arch_subpath])
+        env.Append(LIBS=["c++_static", "c++abi", "android_support"])
     else:
         env.Append(CXXFLAGS=['-fno-rtti', '-fno-exceptions', '-DNO_SAFE_CAST'])
 

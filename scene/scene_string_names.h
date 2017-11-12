@@ -125,6 +125,10 @@ public:
 	StringName ungrouped;
 
 	StringName has_point;
+
+        StringName _drag_enter;
+        StringName _drag_leave;
+
 	StringName get_drag_data;
 	StringName can_drop_data;
 	StringName drop_data;

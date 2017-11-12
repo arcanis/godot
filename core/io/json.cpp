@@ -89,11 +89,6 @@ String JSON::_print_var(const Variant &p_var) {
 	}
 }
 
-String JSON::print(const Dictionary &p_dict) {
-
-	return _print_var(p_dict);
-}
-
 Error JSON::_get_token(const CharType *p_str, int &idx, int p_len, Token &r_token, int &line, String &r_err_str) {
 
 	while (true) {
@@ -449,4 +444,20 @@ Error JSON::parse(const String &p_json, Dictionary &r_ret, String &r_err_str, in
 	}
 
 	return _parse_object(r_ret, str, idx, len, r_err_line, r_err_str);
+}
+
+Error JSON::parse(const String &p_json, Variant &r_ret, String &r_err_str, int &r_err_line) {
+
+	const CharType *str = p_json.ptr();
+	int idx = 0;
+	int len = p_json.length();
+	Token token;
+	int line = 0;
+	String aux_key;
+
+	Error err = _get_token(str, idx, len, token, line, r_err_str);
+	if (err)
+		return err;
+
+	return _parse_value(r_ret, token, str, idx, len, line, r_err_str);
 }

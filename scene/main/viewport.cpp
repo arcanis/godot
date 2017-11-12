@@ -1770,6 +1770,7 @@ void Viewport::_gui_input_event(InputEvent p_event) {
 						gui.drag_preview = NULL;
 					}
 
+					gui.drag_drop = NULL;
 					gui.drag_data = Variant();
 					_propagate_viewport_notification(this, NOTIFICATION_DRAG_END);
 					//change mouse accordingly
@@ -1939,6 +1940,16 @@ void Viewport::_gui_input_event(InputEvent p_event) {
 					OS::get_singleton()->set_cursor_shape(OS::CURSOR_FORBIDDEN);
 				} else {
 					OS::get_singleton()->set_cursor_shape(OS::CURSOR_CAN_DROP);
+				}
+
+				if (gui.drag_drop && over != gui.drag_drop) {
+					gui.drag_drop->_drag_leave(gui.drag_data);
+					gui.drag_drop = NULL;
+				}
+
+				if (can_drop && over != gui.drag_drop) {
+					gui.drag_drop = over;
+					gui.drag_drop->_drag_enter(gui.drag_data);
 				}
 				//change mouse accordingly i guess
 			}

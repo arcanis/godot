@@ -228,6 +228,9 @@ public:
 
 	void accept_event();
 
+        virtual void _drag_enter(const Variant &p_data);
+        virtual void _drag_leave(const Variant &p_data);
+
 	virtual Size2 get_minimum_size() const;
 	virtual Size2 get_combined_minimum_size() const;
 	virtual bool has_point(const Point2 &p_point) const;

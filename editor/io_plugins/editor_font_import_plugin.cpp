@@ -628,7 +628,7 @@ public:
 		font_size = memnew(SpinBox);
 		vbl->add_margin_child(TTR("Source Font Size:"), font_size);
 		font_size->set_min(3);
-		font_size->set_max(256);
+		font_size->set_max(1024);
 		font_size->set_val(16);
 		font_size->connect("value_changed", this, "_font_size_changed");
 		dest = memnew(EditorLineEditFileChooser);

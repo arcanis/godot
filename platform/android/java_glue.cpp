@@ -43,6 +43,7 @@
 #include "os_android.h"
 #include "thread_jandroid.h"
 #include <unistd.h>
+#include <stdlib.h>
 
 static JavaClassWrapper *java_class_wrapper = NULL;
 static OS_Android *os_android = NULL;

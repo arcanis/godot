@@ -1028,7 +1028,6 @@ bool Tween::interpolate_property(Object *p_object, String p_property, Variant p_
 	interpolates.push_back(data);
 	return true;
 }
-
 bool Tween::interpolate_method(Object *p_object, String p_method, Variant p_initial_val, Variant p_final_val, real_t p_times_in_sec, TransitionType p_trans_type, EaseType p_ease_type, real_t p_delay) {
 	if (pending_update != 0) {
 		_add_pending_command("interpolate_method", p_object, p_method, p_initial_val, p_final_val, p_times_in_sec, p_trans_type, p_ease_type, p_delay);
@@ -1041,7 +1040,7 @@ bool Tween::interpolate_method(Object *p_object, String p_method, Variant p_init
 	ERR_FAIL_COND_V(p_object == NULL, false);
 	ERR_FAIL_COND_V(!ObjectDB::instance_validate(p_object), false);
 	ERR_FAIL_COND_V(p_initial_val.get_type() != p_final_val.get_type(), false);
-	ERR_FAIL_COND_V(p_times_in_sec <= 0, false);
+	ERR_FAIL_COND_V(p_times_in_sec <= 0.0, false);
 	ERR_FAIL_COND_V(p_trans_type < 0 || p_trans_type >= TRANS_COUNT, false);
 	ERR_FAIL_COND_V(p_ease_type < 0 || p_ease_type >= EASE_COUNT, false);
 	ERR_FAIL_COND_V(p_delay < 0, false);
