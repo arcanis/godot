@@ -1005,10 +1005,10 @@ bool Tween::interpolate_property(Object *p_object, String p_property, Variant p_
 	ERR_FAIL_COND_V(p_object == NULL, false);
 	ERR_FAIL_COND_V(!ObjectDB::instance_validate(p_object), false);
 	ERR_FAIL_COND_V(p_initial_val.get_type() != p_final_val.get_type(), false);
-	ERR_FAIL_COND_V(p_duration <= 0, false);
+	ERR_FAIL_COND_V(p_duration <= 0.0, false);
 	ERR_FAIL_COND_V(p_trans_type < 0 || p_trans_type >= TRANS_COUNT, false);
 	ERR_FAIL_COND_V(p_ease_type < 0 || p_ease_type >= EASE_COUNT, false);
-	ERR_FAIL_COND_V(p_delay < 0, false);
+	ERR_FAIL_COND_V(p_delay < 0.0, false);
 
 	bool prop_valid = false;
 	p_object->get(p_property, &prop_valid);
