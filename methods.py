@@ -9,9 +9,13 @@ def add_source_files(self, sources, filetype, lib_env=None, shared=False):
     if not lib_env:
         lib_env = self
     if type(filetype) == type(""):
-
-        dir = self.Dir('.').abspath
-        list = glob.glob(dir + "/" + filetype)
+        pattern = filetype
+        if not os.path.isabs(pattern):
+            dir = self.Dir('.').abspath
+            pattern = dir + "/" + pattern
+        list = glob.glob(pattern)
+        if len(list) == 0:
+            raise ValueError, "No source files matched your pattern (" + pattern + ")"
         for f in list:
             sources.append(self.Object(f))
     else:
