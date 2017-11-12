@@ -42,6 +42,7 @@
 #include "os_android.h"
 #include "project_settings.h"
 #include "thread_jandroid.h"
+#include <stdlib.h>
 #include <unistd.h>
 
 static JavaClassWrapper *java_class_wrapper = NULL;
