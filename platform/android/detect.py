@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import string
 import platform
@@ -227,11 +228,21 @@ def configure(env):
     env.Append(CPPFLAGS=target_opts)
     env.Append(CPPFLAGS=common_opts)
 
+    android_api = re.search("^android-([0-9]+)$", env["ndk_platform"]).group(0)
+
     if env['android_stl']:
-        env.Append(CPPPATH=[env["ANDROID_NDK_ROOT"] + "/sources/cxx-stl/gnu-libstdc++/4.9/include"])
-        env.Append(CPPPATH=[env["ANDROID_NDK_ROOT"] + "/sources/cxx-stl/gnu-libstdc++/4.9/libs/" + arch_subpath + "/include"])
-        env.Append(LIBPATH=[env["ANDROID_NDK_ROOT"] + "/sources/cxx-stl/gnu-libstdc++/4.9/libs/" + arch_subpath])
-        env.Append(LIBS=["gnustl_static"])
+        if android_api >= 21:
+            env.Append(CPPPATH=[env["ANDROID_NDK_ROOT"] + "/sources/android/support/include"])
+            env.Append(CPPPATH=[env["ANDROID_NDK_ROOT"] + "/sources/cxx-stl/llvm-libc++/include"])
+            env.Append(CPPPATH=[env["ANDROID_NDK_ROOT"] + "/sysroot/usr/include"])
+            env.Append(CPPPATH=[env["ANDROID_NDK_ROOT"] + "/sysroot/usr/include/arm-linux-androideabi"])
+            env.Append(LIBPATH=[env["ANDROID_NDK_ROOT"] + "/sources/cxx-stl/llvm-libc++/libs/" + arch_subpath])
+            env.Append(LIBS=["c++_static", "c++abi", "android_support"])
+        else:
+            env.Append(CPPPATH=[env["ANDROID_NDK_ROOT"] + "/sources/cxx-stl/gnu-libstdc++/4.9/include"])
+            env.Append(CPPPATH=[env["ANDROID_NDK_ROOT"] + "/sources/cxx-stl/gnu-libstdc++/4.9/libs/" + arch_subpath + "/include"])
+            env.Append(LIBPATH=[env["ANDROID_NDK_ROOT"] + "/sources/cxx-stl/gnu-libstdc++/4.9/libs/" + arch_subpath])
+            env.Append(LIBS=["gnustl_static"])
     else:
         env.Append(CXXFLAGS=['-fno-rtti', '-fno-exceptions', '-DNO_SAFE_CAST'])
 
@@ -253,7 +264,7 @@ def configure(env):
                         '/toolchains/arm-linux-androideabi-4.9/prebuilt/' + host_subpath + '/' + abi_subpath + '/lib'])
 
     env.Append(CPPPATH=['#platform/android'])
-    env.Append(CPPFLAGS=['-DANDROID_ENABLED', '-DUNIX_ENABLED', '-DNO_FCNTL', '-DMPC_FIXED_POINT'])
+    env.Append(CPPFLAGS=['-DANDROID_ENABLED', '-D__ANDROID_API__=' + android_api, '-DUNIX_ENABLED', '-DNO_FCNTL', '-DMPC_FIXED_POINT'])
     env.Append(LIBS=['OpenSLES', 'EGL', 'GLESv3', 'android', 'log', 'z', 'dl'])
 
     # TODO: Move that to opus module's config
