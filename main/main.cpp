@@ -1360,28 +1360,6 @@ bool Main::start() {
 		}
 #endif
 
-#ifdef TOOLS_ENABLED
-
-		EditorNode *editor_node = NULL;
-		if (editor) {
-
-			editor_node = memnew(EditorNode);
-			sml->get_root()->add_child(editor_node);
-
-			//root_node->set_editor(editor);
-			//startup editor
-
-			if (_export_preset != "") {
-
-				editor_node->export_preset(_export_preset, game_path, export_debug, "", true);
-				game_path = ""; //no load anything
-			}
-		}
-#endif
-
-		{
-		}
-
 		if (!editor) {
 			//standard helpers that can be changed from main config
 
@@ -1477,20 +1455,11 @@ bool Main::start() {
 			}
 
 			local_game_path = ProjectSettings::get_singleton()->localize_path(local_game_path);
-
-#ifdef TOOLS_ENABLED
-			if (editor) {
-
-				Error serr = editor_node->load_scene(local_game_path);
-				if (serr != OK)
-					ERR_PRINT("Failed to load scene");
-				OS::get_singleton()->set_context(OS::CONTEXT_EDITOR);
-			}
-#endif
 		}
 
-		if (!project_manager_request && !editor) {
+		if (!project_manager_request) {
 			if (game_path != "" || script != "") {
+
 				//autoload
 				List<PropertyInfo> props;
 				ProjectSettings::get_singleton()->get_property_list(&props);
@@ -1535,10 +1504,14 @@ bool Main::start() {
 					ERR_CONTINUE(res.is_null());
 					Node *n = NULL;
 					if (res->is_class("PackedScene")) {
+						if (editor)
+							continue;
 						Ref<PackedScene> ps = res;
 						n = ps->instance();
 					} else if (res->is_class("Script")) {
 						Ref<Script> s = res;
+						if (!s->is_tool())
+							continue;
 						StringName ibt = s->get_instance_base_type();
 						bool valid_type = ClassDB::is_parent_class(ibt, "Node");
 						ERR_EXPLAIN("Script does not inherit a Node: " + path);
@@ -1573,7 +1546,32 @@ bool Main::start() {
 				}
 				//singletons
 			}
+		}
 
+#ifdef TOOLS_ENABLED
+		EditorNode *editor_node = NULL;
+		if (editor) {
+			editor_node = memnew(EditorNode);
+			sml->get_root()->add_child(editor_node);
+
+			//root_node->set_editor(editor);
+			//startup editor
+
+			if (_export_preset != "") {
+				editor_node->export_preset(_export_preset, game_path, export_debug, "", true);
+				game_path = ""; //no load anything
+			}
+
+			if (game_path != "") {
+				Error serr = editor_node->load_scene(local_game_path);
+				if (serr != OK)
+					ERR_PRINT("Failed to load scene");
+				OS::get_singleton()->set_context(OS::CONTEXT_EDITOR);
+			}
+		}
+#endif
+
+		if (!project_manager_request && !editor) {
 			if (game_path != "") {
 				Node *scene = NULL;
 				Ref<PackedScene> scenedata = ResourceLoader::load(local_game_path);
