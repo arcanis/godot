@@ -228,7 +228,7 @@ def configure(env):
     env.Append(CPPFLAGS=target_opts)
     env.Append(CPPFLAGS=common_opts)
 
-    android_api = re.search("^android-([0-9]+)$", env["ndk_platform"]).group(0)
+    android_api = re.search("^android-([0-9]+)$", env["ndk_platform"]).group(1)
 
     if env['android_stl']:
         if android_api >= 21:
